@@ -117,7 +117,7 @@ export function render(s) {
       btn.id = 'exhausted-new';
       info.append(btn);
     } else if (s.name === 'playing') info.append(placeholder('HUIDIG NUMMER', 'HET VOLGENDE NUMMER IS...', 'Luister goed. Doe je gok.'));
-    else info.append(placeholder('KLAAR?', s.round ? 'OP NAAR DE VOLGENDE' : 'DRUK OP VOLGENDE NUMMER', 'De discobal kiest de uitdaging.'));
+    else info.append(placeholder('KLAAR?', s.round ? 'OP NAAR DE VOLGENDE' : 'DRUK OP VOLGENDE NUMMER', 'Dansvloer klaar, oren gespitst.'));
   }
 
   // Controls
@@ -129,9 +129,6 @@ export function render(s) {
   $('reveal-small').textContent = s.name === 'revealed' ? 'ANTWOORD STAAT ER' : 'IEDEREEN EEN GOK?';
   $('reveal-strong').textContent = s.name === 'revealed' ? 'ONTHULD' : 'ONTHUL ANTWOORD';
 
-  const showMini = (s.name === 'playing' || s.name === 'revealed') && !s.busy;
-  $('mini-controls').hidden = !showMini;
-  $('pause-button').innerHTML = s.playing ? '❚❚ <span>PAUZE</span>' : '▶ <span>VERDER</span>';
 }
 
 export function renderPlaylists(playlists, filter, onPick) {

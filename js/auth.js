@@ -1,12 +1,22 @@
 // Spotify authentication: Authorization Code with PKCE. No client secret anywhere.
-import { SPOTIFY_CLIENT_ID, SPOTIFY_SCOPES, getRedirectUri } from './config.js';
+import { SPOTIFY_SCOPES, getRedirectUri } from './config.js';
 import { load, save, remove } from './storage.js';
 
 const AUTH_URL = 'https://accounts.spotify.com/authorize';
 const TOKEN_URL = 'https://accounts.spotify.com/api/token';
 
-export function isConfigured() {
-  return SPOTIFY_CLIENT_ID && !SPOTIFY_CLIENT_ID.startsWith('PASTE_');
+const CLIENT_ID_RE = /^[0-9a-f]{32}$/i;
+
+export const getClientId = () => load('clientId', '');
+export const isConfigured = () => CLIENT_ID_RE.test(getClientId());
+
+// Returns false when the value does not look like a Spotify Client ID.
+export function setClientId(value) {
+  const id = (value || '').trim();
+  if (!CLIENT_ID_RE.test(id)) return false;
+  if (id !== getClientId()) remove('token');
+  save('clientId', id);
+  return true;
 }
 
 function randomString(length) {
@@ -28,7 +38,7 @@ export async function login(returnTo = '') {
   save('pkce', { verifier, state, returnTo });
   const params = new URLSearchParams({
     response_type: 'code',
-    client_id: SPOTIFY_CLIENT_ID,
+    client_id: getClientId(),
     scope: SPOTIFY_SCOPES,
     redirect_uri: getRedirectUri(),
     code_challenge_method: 'S256',
@@ -74,7 +84,7 @@ export async function handleRedirect() {
       grant_type: 'authorization_code',
       code: params.get('code'),
       redirect_uri: getRedirectUri(),
-      client_id: SPOTIFY_CLIENT_ID,
+      client_id: getClientId(),
       code_verifier: pkce.verifier
     });
     storeToken(data);
@@ -100,7 +110,7 @@ export async function getAccessToken(forceRefresh = false) {
     refreshing = tokenRequest({
       grant_type: 'refresh_token',
       refresh_token: token.refreshToken,
-      client_id: SPOTIFY_CLIENT_ID
+      client_id: getClientId()
     }).then(data => { storeToken(data); return data.access_token; })
       .catch(err => { logout(); throw new Error('session_expired'); })
       .finally(() => { refreshing = null; });

@@ -122,7 +122,7 @@ $('import-json').onchange = async e => {
 };
 
 async function init(force = false) {
-  if (!auth.isConfigured()) { notify('Vul eerst je Spotify Client ID in js/config.js in.'); return; }
+  if (!auth.isConfigured()) { notify('Koppel eerst Spotify in het spel (Client ID invullen).'); return; }
   if (!auth.isLoggedIn()) { $('login-card').hidden = false; return; }
   const sel = getSelectedPlaylist();
   if (!sel?.id) { notify('Kies eerst een playlist in het spel (instellingen).'); return; }

@@ -1,19 +1,20 @@
 # Top 2000 Disco
 
-A browser-based music quiz for a Top 2000 disco night. The host connects Spotify and picks the Top 2000 playlist, then presses **Volgende nummer** to play a random song and **Onthul antwoord** to show the title, artist and original release year. A physical disco ball decides what people have to guess. The app does no scoring and no judging.
+A browser-based music quiz for a Top 2000 disco night. The host connects Spotify and picks the Top 2000 playlist, then presses **Volgende nummer** to play a random song and **Onthul antwoord** to show the title, artist and original release year. The players handle the rest themselves; the app does no scoring, no judging and no challenge selection.
 
 Runs as a static site on GitHub Pages. There is no backend and no build step.
 
 ## Features
 
-- Spotify login with Authorization Code + PKCE (no client secret)
+- Spotify login with Authorization Code + PKCE (no client secret); the Client ID is entered in the app and stored on the device only, so nothing Spotify-related is committed
+- Opens the default Top 2000 playlist automatically (`DEFAULT_PLAYLIST_ID` in `js/config.js`)
 - Playlist picker and track import with pagination (only playlists you own or collaborate on, per Spotify's Development Mode rules)
 - Random order without repeats; a skipped song counts as played; the session survives a page reload
 - Playback in the browser (Web Playback SDK) on laptop/desktop, or via Spotify Connect to the Spotify app on an iPad/phone or a speaker
 - Answer stays hidden until it is revealed: fixed page title, artwork only loaded on reveal, neutral media-session metadata
 - Release years come from the official NPO Radio 2 Top 2000 list (`data/top2000-2025.json`). Songs not on the list fall back to the Spotify album year and are marked "nakijken"
 - Metadata page (`beheer.html`) to review and correct years, with export to `songs.json` and CSV
-- Dutch interface, dark disco design, responsive (TV, laptop, tablet, phone), offline shell via a service worker
+- Dutch interface, flashy disco design (light beams, mirror ball, reveal flash), responsive (TV, laptop, tablet, phone), offline shell via a service worker
 
 ## Requirements
 
@@ -38,7 +39,7 @@ Runs as a static site on GitHub Pages. There is no backend and no build step.
    - optional for local testing: `http://127.0.0.1:8080/`
 3. APIs used: **Web API** and **Web Playback SDK**.
 4. User Management: add the Spotify account of the host (max 5 users in Development Mode).
-5. Copy the **Client ID** into `js/config.js` (`SPOTIFY_CLIENT_ID`). The Client ID is not a secret; never put a client secret in this repo.
+5. Open the app, paste the **Client ID** on the setup screen and press *Koppelen*. It is stored in the browser of that device only (change it later under settings → *Client ID wijzigen*). Never put a client secret anywhere.
 
 ### 3. Run locally (optional)
 
@@ -70,7 +71,7 @@ styles.css
 sw.js                 service worker (bump VERSION each release)
 data/top2000-2025.json  official list with years
 data/songs.json       exported corrections
-js/config.js          version, Client ID, data files
+js/config.js          version, default playlist, data files
 js/auth.js            Spotify PKCE login and token refresh
 js/spotify-api.js     Web API client
 js/playlist.js        playlist selection and track import

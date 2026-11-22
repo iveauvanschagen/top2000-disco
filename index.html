@@ -18,6 +18,8 @@
 <body data-state="loading">
   <div class="ambient ambient-one"></div>
   <div class="ambient ambient-two"></div>
+  <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="flash" id="flash" aria-hidden="true"></div>
   <main class="app-shell">
     <header class="topbar">
       <a class="brand" href="./" aria-label="Top 2000 Disco">
@@ -31,18 +33,25 @@
     </header>
 
     <section class="intro">
-      <div class="eyebrow"><span class="eyebrow-line"></span> DE ULTIEME MUZIEKAVOND</div>
-      <h1>ZET DE <em>PLAAT</em><br>MAAR OP.</h1>
-      <p>Eén playlist. Een zaal vol muziekkenners.<br>Hoe goed ken jij je Top 2000?</p>
+      <div class="mirrorball" aria-hidden="true"><div class="ball"></div></div>
+      <h1><span class="neon">TOP 2000</span> <br><em>DISCO</em></h1>
     </section>
 
     <div class="notice" id="notice" hidden><span id="notice-text"></span><button id="notice-close" aria-label="Sluiten">×</button></div>
 
     <!-- Setup needed -->
     <section class="card screen" id="screen-unconfigured" hidden>
-      <span class="info-kicker">EERST EVEN INSTELLEN</span>
-      <h2>Spotify Client ID ontbreekt</h2>
-      <p>Vul je Client ID in <code>js/config.js</code> in. De README legt stap voor stap uit hoe.</p>
+      <span class="info-kicker">EENMALIG INSTELLEN</span>
+      <h2>Koppel je Spotify-app</h2>
+      <ol class="steps">
+        <li>Maak een app op <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> (Web API en Web Playback SDK aanvinken).</li>
+        <li>Zet deze Redirect URI erin: <code id="redirect-uri"></code> <button type="button" class="mini-button" id="copy-redirect">KOPIEER</button></li>
+        <li>Plak hieronder de Client ID. Hij wordt alleen op dit apparaat bewaard.</li>
+      </ol>
+      <form id="client-form" class="client-form">
+        <input class="search" id="client-id" placeholder="Client ID (32 tekens)" autocomplete="off" spellcheck="false">
+        <button class="button button-primary" type="submit"><span class="button-icon">✦</span><span><small>OPSLAAN</small><strong>KOPPELEN</strong></span></button>
+      </form>
     </section>
 
     <!-- Not connected -->
@@ -101,30 +110,10 @@
         </button>
       </div>
 
-      <div class="mini-controls" id="mini-controls" hidden>
-        <button class="mini-button" id="pause-button">❚❚ <span>PAUZE</span></button>
-        <button class="mini-button" id="replay-button">↺ <span>OPNIEUW</span></button>
-      </div>
-
-      <div class="hint-row" id="hint-row"><span>♫</span> De discobal bepaalt wat er geraden moet worden.</div>
-    </section>
-
-    <section class="challenge-section">
-      <div class="section-heading">
-        <div><span class="eyebrow">DE DISCOBAL BEPAALT</span><h3>WAT MOET JE RADEN?</h3></div>
-        <span class="external-note">GEEN KAARTJES. GEWOON GOEIE MUZIEK.</span>
-      </div>
-      <div class="challenge-grid">
-        <div class="challenge-item"><span class="challenge-symbol">#</span><div><strong>EXACT JAAR</strong><small>Noem het releasejaar</small></div></div>
-        <div class="challenge-item"><span class="challenge-symbol">±3</span><div><strong>BINNEN 3 JAAR</strong><small>Dichtbij is goed genoeg</small></div></div>
-        <div class="challenge-item"><span class="challenge-symbol">Aa</span><div><strong>TITEL</strong><small>Hoe heet het nummer?</small></div></div>
-        <div class="challenge-item"><span class="challenge-symbol">♫</span><div><strong>ARTIEST</strong><small>Wie zingt het?</small></div></div>
-        <div class="challenge-item"><span class="challenge-symbol">80s</span><div><strong>DECENNIUM</strong><small>Welke jaren?</small></div></div>
-      </div>
     </section>
 
     <footer>
-      <span>VOOR JOUW TOP 2000-AVOND</span>
+      <span>LET THE GOOD TIMES PLAY</span>
       <span class="footer-star">✳</span>
       <span>VERSIE <b id="app-version"></b></span>
     </footer>
@@ -165,6 +154,12 @@
         <span class="info-kicker">SESSIE</span>
         <p id="settings-session">-</p>
         <button type="button" class="mini-button" id="new-session">NIEUWE SESSIE (OPNIEUW SCHUDDEN)</button>
+      </div>
+
+      <div class="settings-block">
+        <span class="info-kicker">SPOTIFY-KOPPELING</span>
+        <p class="muted small">Client ID staat alleen op dit apparaat.</p>
+        <button type="button" class="mini-button" id="reset-client">CLIENT ID WIJZIGEN</button>
       </div>
 
       <div class="settings-block settings-foot">

@@ -5,6 +5,7 @@ import * as playlistMod from './playlist.js';
 import * as songs from './songs.js';
 import * as shuffle from './shuffle.js';
 import * as player from './player.js';
+import { DEFAULT_PLAYLIST_ID } from './config.js';
 
 const subscribers = new Set();
 let state = {
@@ -73,8 +74,7 @@ export async function start() {
   if (redirect.error) notify(redirect.error === 'access_denied' ? 'Verbinden met Spotify geannuleerd.' : 'Verbinden met Spotify mislukt. Probeer opnieuw.');
   if (!auth.isLoggedIn()) return set({ name: 'not_connected' });
   const selected = playlistMod.getSelectedPlaylist();
-  if (selected?.id) return openPlaylist(selected.id);
-  return showPlaylists();
+  return openPlaylist(selected?.id || DEFAULT_PLAYLIST_ID);
 }
 
 export async function showPlaylists() {
@@ -107,8 +107,10 @@ export async function openPlaylist(id, { force = false } = {}) {
       stats: built.stats, round: session.round, remaining: shuffle.remaining(session)
     });
   } catch (err) {
-    if (err?.status === 404 || err?.status === 403) {
-      notify('Deze playlist kan niet geladen worden. Kies een playlist die van jou is.');
+    if (err?.status === 404 || err?.status === 403 || err?.code === 'empty_playlist') {
+      notify(id === DEFAULT_PLAYLIST_ID
+        ? 'De standaardplaylist kan niet geladen worden. Spotify geeft alleen playlists die van jou zijn (of waar je aan meewerkt). Kies hieronder een andere.'
+        : 'Deze playlist kan niet geladen worden. Kies een playlist die van jou is.');
       playlistMod.setSelectedPlaylist({ id: null, name: null });
       return showPlaylists();
     }
@@ -174,3 +176,15 @@ export function logout() {
 }
 
 export const login = () => auth.login();
+
+export function saveClientId(value) {
+  if (!auth.setClientId(value)) { notify('Dat lijkt geen geldige Client ID (32 tekens, letters en cijfers).'); return false; }
+  clearNotice();
+  set({ name: auth.isLoggedIn() ? state.name : 'not_connected' });
+  return true;
+}
+
+export function resetClientId() {
+  logout();
+  set({ name: 'unconfigured' });
+}

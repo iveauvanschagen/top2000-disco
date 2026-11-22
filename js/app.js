@@ -1,5 +1,5 @@
 // Bootstrap: wires the DOM to the game controller.
-import { APP_VERSION } from './config.js';
+import { APP_VERSION, getRedirectUri } from './config.js';
 import * as game from './game.js';
 import * as player from './player.js';
 import { render, renderPlaylists, renderSettings } from './ui.js';
@@ -19,8 +19,14 @@ game.subscribe(s => {
 $('connect-button').addEventListener('click', () => game.login());
 $('next-button').addEventListener('click', () => game.next());
 $('reveal-button').addEventListener('click', () => game.reveal());
-$('pause-button').addEventListener('click', () => game.togglePause());
-$('replay-button').addEventListener('click', () => game.replay());
+$('redirect-uri').textContent = getRedirectUri();
+$('copy-redirect').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(getRedirectUri()); $('copy-redirect').textContent = 'GEKOPIEERD'; } catch { /* select manually */ }
+});
+$('client-form').addEventListener('submit', e => {
+  e.preventDefault();
+  game.saveClientId($('client-id').value);
+});
 $('notice-close').addEventListener('click', () => game.clearNotice());
 $('track-info').addEventListener('click', e => { if (e.target.id === 'exhausted-new') game.newSession(); });
 $('playlist-search').addEventListener('input', e => {
@@ -55,6 +61,28 @@ $('reload-playlist').addEventListener('click', () => {
 });
 $('new-session').addEventListener('click', () => { $('settings').close(); game.newSession(); });
 $('logout-button').addEventListener('click', () => { $('settings').close(); game.logout(); });
+$('reset-client').addEventListener('click', () => { $('settings').close(); game.resetClientId(); });
+
+// Reveal flash + sparkle burst.
+let lastName = null;
+game.subscribe(s => {
+  if (s.name === 'revealed' && lastName === 'playing') {
+    const f = $('flash');
+    f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
+    const info = $('track-info');
+    for (let i = 0; i < 28; i++) {
+      const sp = document.createElement('i');
+      sp.className = 'spark';
+      sp.style.setProperty('--x', `${(Math.random() * 2 - 1) * 320}px`);
+      sp.style.setProperty('--y', `${(Math.random() * 2 - 1) * 160}px`);
+      sp.style.setProperty('--c', ['#ff4fa3', '#61e6e1', '#ffb34f', '#b84dff', '#fff'][i % 5]);
+      sp.style.animationDelay = `${Math.random() * 120}ms`;
+      info.append(sp);
+      setTimeout(() => sp.remove(), 1400);
+    }
+  }
+  lastName = s.name;
+});
 
 // iPad without a chosen device: open settings on first Next press.
 $('next-button').addEventListener('click', () => {

@@ -1,8 +1,11 @@
 // Central configuration. The Spotify Client ID is public by design (PKCE, no secret).
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.1.0';
 
-// Paste the Client ID of your Spotify app here (developer.spotify.com/dashboard).
-export const SPOTIFY_CLIENT_ID = 'PASTE_YOUR_CLIENT_ID_HERE';
+// The Spotify Client ID is entered in the app itself and stored on the device,
+// so it never has to be committed to the repository.
+
+// Playlist that is opened by default (must be owned by, or shared with, the host).
+export const DEFAULT_PLAYLIST_ID = '1DTzz7Nh2rJBnyFbjsH1Mh';
 
 export const SPOTIFY_SCOPES = [
   'streaming',

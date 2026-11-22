@@ -50,15 +50,15 @@ body.is-playing .ambient { opacity: .22; animation: breathe 4s ease-in-out infin
 .icon-button:hover { background: rgba(255,255,255,.08); }
 
 /* Intro */
-.intro { text-align: center; padding: 48px 0 30px; }
+.intro { text-align: center; padding: 18px 0 26px; position: relative; }
 .eyebrow { color: var(--cyan); font: 11px var(--mono); letter-spacing: .19em; }
 .eyebrow-line { display: inline-block; width: 25px; height: 1px; background: var(--cyan); vertical-align: middle; margin-right: 8px; }
-h1 { font-size: clamp(42px, 8vw, 80px); line-height: .91; letter-spacing: -.075em; margin: 18px 0 15px; font-weight: 700; }
-h1 em { color: var(--pink); font-style: normal; text-shadow: 0 0 35px rgba(255,79,163,.25); }
+h1 { font-size: clamp(44px, 9vw, 96px); line-height: .88; letter-spacing: -.06em; margin: 6px 0 0; font-weight: 700; }
+h1 em { font-style: normal; background: linear-gradient(90deg, var(--pink), var(--orange), var(--cyan), var(--purple), var(--pink)); background-size: 300% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer 6s linear infinite; filter: drop-shadow(0 0 22px rgba(255,79,163,.45)); letter-spacing: .02em; }
+h1 .neon { color: #fff; text-shadow: 0 0 6px #fff, 0 0 18px var(--pink), 0 0 42px var(--pink); animation: flicker 7s infinite; }
+@keyframes shimmer { to { background-position: 300% 0; } }
+@keyframes flicker { 0%, 18%, 22%, 60%, 64%, 100% { opacity: 1; } 20%, 62% { opacity: .55; } }
 .intro p { color: var(--muted); font-size: 15px; line-height: 1.7; margin: 0; }
-body[data-state="playing"] .intro, body[data-state="revealed"] .intro { padding: 26px 0 18px; }
-body[data-state="playing"] .intro p, body[data-state="revealed"] .intro p,
-body[data-state="playing"] .intro h1, body[data-state="revealed"] .intro h1 { display: none; }
 
 /* Notice */
 .notice { max-width: 760px; margin: 0 auto 16px; padding: 12px 14px 12px 18px; border-radius: 12px; display: flex; gap: 12px; align-items: center; justify-content: space-between; font-size: 15px; border: 1px solid rgba(255,79,163,.45); background: rgba(255,79,163,.1); }
@@ -241,3 +241,60 @@ table.songs input.note { width: 100%; min-width: 120px; padding: 6px; border-rad
 .progress { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 8px; }
 .progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--pink)); transition: width .3s; }
 .unmatched { max-height: 220px; overflow: auto; font-size: 13px; color: var(--muted); margin: 8px 0 0; padding-left: 18px; }
+
+/* Disco atmosphere */
+.lights { position: fixed; inset: 0; pointer-events: none; overflow: hidden; mix-blend-mode: screen; opacity: .35; transition: opacity .8s; }
+.lights i { position: absolute; top: -20vh; left: 50%; width: 22vw; min-width: 160px; height: 140vh; transform-origin: 50% 0; filter: blur(30px); animation: sweep 9s ease-in-out infinite alternate; }
+.lights i:nth-child(1) { background: linear-gradient(rgba(255,79,163,.55), transparent 75%); --from: -38deg; --to: 12deg; }
+.lights i:nth-child(2) { background: linear-gradient(rgba(97,230,225,.45), transparent 75%); --from: 30deg; --to: -18deg; animation-duration: 11s; }
+.lights i:nth-child(3) { background: linear-gradient(rgba(184,77,255,.5), transparent 75%); --from: -10deg; --to: 40deg; animation-duration: 13s; }
+.lights i:nth-child(4) { background: linear-gradient(rgba(255,179,79,.35), transparent 75%); --from: 22deg; --to: -36deg; animation-duration: 15s; }
+@keyframes sweep { from { transform: translateX(-50%) rotate(var(--from)); } to { transform: translateX(-50%) rotate(var(--to)); } }
+body.is-playing .lights { opacity: .7; }
+body.is-playing .lights i { animation-duration: 3.5s; }
+body[data-state="revealed"] .lights { opacity: .85; }
+
+.mirrorball { position: relative; width: 74px; height: 110px; margin: 0 auto; }
+.mirrorball::before { content: ""; position: absolute; left: 50%; top: 0; width: 1px; height: 36px; background: linear-gradient(transparent, #8a86a3); }
+.ball { position: absolute; bottom: 0; left: 0; width: 74px; height: 74px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.95) 0 6%, transparent 18%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.35) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 9px),
+    conic-gradient(from 0deg, #d9d6ea, #6f6b8d, #fff, #8e89ad, #e9e6f7, #5d5a78, #d9d6ea);
+  box-shadow: 0 0 30px rgba(255,255,255,.25), 0 0 70px rgba(255,79,163,.25), inset -10px -12px 20px rgba(0,0,0,.45);
+  animation: ballspin 6s linear infinite; }
+@keyframes ballspin { to { background-position: 0 0, 90px 0, 0 0, 0 0; filter: hue-rotate(40deg); } }
+body.is-playing .ball { animation-duration: 2s; box-shadow: 0 0 40px rgba(255,255,255,.45), 0 0 110px rgba(255,79,163,.5), inset -10px -12px 20px rgba(0,0,0,.45); }
+
+.game-panel { position: relative; overflow: hidden; }
+.game-panel::before { content: ""; position: absolute; inset: -2px; border-radius: inherit; padding: 2px; pointer-events: none; opacity: 0; transition: opacity .6s;
+  background: conic-gradient(from var(--a, 0deg), var(--pink), var(--cyan), var(--purple), var(--orange), var(--pink));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: rim 4s linear infinite; }
+@property --a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes rim { to { --a: 360deg; } }
+body.is-playing .game-panel::before, body[data-state="revealed"] .game-panel::before { opacity: 1; }
+
+body[data-state="playing"]:not(.is-busy) #reveal-button { animation: glow 1.6s ease-in-out infinite; }
+@keyframes glow { 50% { box-shadow: 0 0 0 6px rgba(255,79,163,.18), 0 10px 50px rgba(255,79,163,.55); } }
+
+.flash { position: fixed; inset: 0; pointer-events: none; opacity: 0; z-index: 50; background: radial-gradient(circle at 50% 55%, rgba(255,255,255,.9), rgba(255,79,163,.5) 40%, transparent 75%); }
+.flash.go { animation: flash .7s ease-out; }
+@keyframes flash { 0% { opacity: 0; } 15% { opacity: 1; } 100% { opacity: 0; } }
+.track-info { position: relative; }
+.spark { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; border-radius: 2px; background: var(--c); box-shadow: 0 0 10px var(--c); pointer-events: none; animation: burst 1.2s cubic-bezier(.15,.8,.3,1) forwards; }
+@keyframes burst { from { transform: translate(-50%,-50%) scale(1) rotate(0); opacity: 1; } to { transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(.2) rotate(540deg); opacity: 0; } }
+
+.steps { padding-left: 20px; line-height: 1.7; color: #d7d2e6; }
+.steps a { color: var(--cyan); }
+.steps code { word-break: break-all; }
+.client-form { display: grid; gap: 10px; margin-top: 8px; }
+.client-form .search { font-family: var(--mono); margin: 0; }
+
+/* Compact header during the game so buttons and answer fit on one screen (TV) */
+body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [data-state="exhausted"]) .intro { padding: 4px 0 14px; display: flex; align-items: center; justify-content: center; gap: 18px; }
+body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [data-state="exhausted"]) .intro h1 { font-size: clamp(30px, 5vw, 58px); margin: 0; }
+body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [data-state="exhausted"]) .intro h1 br { display: none; }
+body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [data-state="exhausted"]) .mirrorball { margin: 0; width: 54px; height: 70px; flex: 0 0 auto; }
+body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [data-state="exhausted"]) .ball { width: 54px; height: 54px; }
+body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [data-state="exhausted"]) .track-stage { height: 170px; }
