@@ -8,18 +8,28 @@ const $ = id => document.getElementById(id);
 let playlistFilter = '';
 let devices = [];
 
-$('app-version').textContent = APP_VERSION;
 $('settings-version').textContent = APP_VERSION;
+$('app-version').textContent = APP_VERSION;
+$('redirect-uri').textContent = getRedirectUri();
 
 game.subscribe(s => {
   render(s);
   if (s.name === 'playlist') renderPlaylists(s.playlists || [], playlistFilter, p => game.openPlaylist(p.id));
 });
 
-$('connect-button').addEventListener('click', () => game.login());
-$('next-button').addEventListener('click', () => game.next());
+// Main controls
+$('next-button').addEventListener('click', () => {
+  const s = game.getState();
+  if (s.name === 'exhausted') return game.newSession();
+  if (!player.getDevicePref()) $('settings-button').click();
+  game.next();
+});
 $('reveal-button').addEventListener('click', () => game.reveal());
-$('redirect-uri').textContent = getRedirectUri();
+$('pause-button').addEventListener('click', () => game.togglePause());
+
+// Setup and connection
+$('connect-button').addEventListener('click', () => game.login());
+$('notice-close').addEventListener('click', () => game.clearNotice());
 $('copy-redirect').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(getRedirectUri()); $('copy-redirect').textContent = 'GEKOPIEERD'; } catch { /* select manually */ }
 });
@@ -27,8 +37,6 @@ $('client-form').addEventListener('submit', e => {
   e.preventDefault();
   game.saveClientId($('client-id').value);
 });
-$('notice-close').addEventListener('click', () => game.clearNotice());
-$('track-info').addEventListener('click', e => { if (e.target.id === 'exhausted-new') game.newSession(); });
 $('playlist-search').addEventListener('input', e => {
   playlistFilter = e.target.value;
   renderPlaylists(game.getState().playlists || [], playlistFilter, p => game.openPlaylist(p.id));
@@ -48,6 +56,7 @@ $('settings-button').addEventListener('click', () => {
   $('settings').showModal();
   if (!['unconfigured', 'not_connected'].includes(game.getState().name)) refreshDevices();
 });
+$('settings').addEventListener('click', e => { if (e.target === $('settings')) $('settings').close(); });
 $('device-refresh').addEventListener('click', refreshDevices);
 $('device-select').addEventListener('change', e => {
   const d = devices.find(x => x.id === e.target.value);
@@ -63,33 +72,26 @@ $('new-session').addEventListener('click', () => { $('settings').close(); game.n
 $('logout-button').addEventListener('click', () => { $('settings').close(); game.logout(); });
 $('reset-client').addEventListener('click', () => { $('settings').close(); game.resetClientId(); });
 
-// Reveal flash + sparkle burst.
+// Reveal effect: flash plus a burst of sparks in the design colours.
 let lastName = null;
 game.subscribe(s => {
-  if (s.name === 'revealed' && lastName === 'playing') {
+  if (s.name === 'revealed' && lastName === 'playing' && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const f = $('flash');
     f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
-    const info = $('track-info');
-    for (let i = 0; i < 28; i++) {
+    const host = document.querySelector('.copy');
+    for (let i = 0; i < 30; i++) {
       const sp = document.createElement('i');
       sp.className = 'spark';
-      sp.style.setProperty('--x', `${(Math.random() * 2 - 1) * 320}px`);
-      sp.style.setProperty('--y', `${(Math.random() * 2 - 1) * 160}px`);
-      sp.style.setProperty('--c', ['#ff4fa3', '#61e6e1', '#ffb34f', '#b84dff', '#fff'][i % 5]);
+      sp.style.setProperty('--x', `${(Math.random() * 2 - 1) * 380}px`);
+      sp.style.setProperty('--y', `${(Math.random() * 2 - 1) * 220}px`);
+      sp.style.setProperty('--c', ['#ff60b9', '#88eadf', '#f5f0e7', '#9d7aff'][i % 4]);
       sp.style.animationDelay = `${Math.random() * 120}ms`;
-      info.append(sp);
+      host.append(sp);
       setTimeout(() => sp.remove(), 1400);
     }
   }
   lastName = s.name;
 });
-
-// iPad without a chosen device: open settings on first Next press.
-$('next-button').addEventListener('click', () => {
-  if (!player.getDevicePref() && game.getState().name !== 'not_connected') $('settings-button').click();
-}, { capture: true });
-
-// Spacebar/Enter are left alone; keyboard shortcuts are a future enhancement.
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('sw.js').catch(() => {});

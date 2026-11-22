@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090914">
+  <meta name="theme-color" content="#100e18">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Top 2000 Disco</title>
@@ -12,159 +12,118 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body data-state="loading">
-  <div class="ambient ambient-one"></div>
-  <div class="ambient ambient-two"></div>
-  <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <div class="flash" id="flash" aria-hidden="true"></div>
-  <main class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="./" aria-label="Top 2000 Disco">
-        <span class="brand-mark">✳</span>
-        <span class="brand-copy"><strong>TOP 2000</strong><small>DISCO EDITION</small></span>
-      </a>
-      <div class="topbar-right">
-        <span class="connection" id="connection"><i></i> <span id="connection-text">SPOTIFY NIET VERBONDEN</span></span>
-        <button class="icon-button" id="settings-button" aria-label="Instellingen" title="Instellingen">⚙</button>
+  <div class="app">
+    <header class="header">
+      <a class="brand" href="./" aria-label="Top 2000 Disco Edition"><span class="brand-top">TOP <b>2000</b><span class="brand-star" aria-hidden="true">✳</span></span><span class="brand-bottom">DISCO EDITION</span></a>
+      <div class="header-right">
+        <span class="connection" id="connection"><i></i><span id="connection-text">NIET VERBONDEN</span></span>
+        <button class="settings-button" id="settings-button" aria-label="Instellingen" aria-haspopup="dialog"><span aria-hidden="true">⚙</span></button>
       </div>
     </header>
 
-    <section class="intro">
-      <div class="mirrorball" aria-hidden="true"><div class="ball"></div></div>
-      <h1><span class="neon">TOP 2000</span> <br><em>DISCO</em></h1>
-    </section>
+    <main>
+      <div class="notice" id="notice" hidden><span id="notice-text"></span><button id="notice-close" aria-label="Sluiten">×</button></div>
 
-    <div class="notice" id="notice" hidden><span id="notice-text"></span><button id="notice-close" aria-label="Sluiten">×</button></div>
+      <!-- Setup: Client ID -->
+      <section class="panel screen" id="screen-unconfigured" hidden>
+        <h1 class="panel-title">EENMALIG <span class="accent">KOPPELEN.</span></h1>
+        <ol class="steps">
+          <li>Maak een app op <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> met Web API en Web Playback SDK.</li>
+          <li>Redirect URI: <code id="redirect-uri"></code> <button type="button" class="chip" id="copy-redirect">KOPIEER</button></li>
+          <li>Plak de Client ID hieronder. Die blijft op dit apparaat.</li>
+        </ol>
+        <form id="client-form" class="client-form">
+          <input class="field" id="client-id" placeholder="Client ID" autocomplete="off" spellcheck="false">
+          <button class="button button-next" type="submit"><span class="button-symbol" aria-hidden="true">✳</span><span>KOPPELEN</span></button>
+        </form>
+      </section>
 
-    <!-- Setup needed -->
-    <section class="card screen" id="screen-unconfigured" hidden>
-      <span class="info-kicker">EENMALIG INSTELLEN</span>
-      <h2>Koppel je Spotify-app</h2>
-      <ol class="steps">
-        <li>Maak een app op <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> (Web API en Web Playback SDK aanvinken).</li>
-        <li>Zet deze Redirect URI erin: <code id="redirect-uri"></code> <button type="button" class="mini-button" id="copy-redirect">KOPIEER</button></li>
-        <li>Plak hieronder de Client ID. Hij wordt alleen op dit apparaat bewaard.</li>
-      </ol>
-      <form id="client-form" class="client-form">
-        <input class="search" id="client-id" placeholder="Client ID (32 tekens)" autocomplete="off" spellcheck="false">
-        <button class="button button-primary" type="submit"><span class="button-icon">✦</span><span><small>OPSLAAN</small><strong>KOPPELEN</strong></span></button>
-      </form>
-    </section>
+      <!-- Not connected -->
+      <section class="panel screen" id="screen-connect" hidden>
+        <h1 class="panel-title">EERST EVEN <span class="accent">INPLUGGEN.</span></h1>
+        <button class="button button-next" id="connect-button"><span class="button-symbol" aria-hidden="true">♫</span><span>VERBIND SPOTIFY</span></button>
+      </section>
 
-    <!-- Not connected -->
-    <section class="card screen" id="screen-connect" hidden>
-      <span class="info-kicker">STAP 1</span>
-      <h2>Verbind met Spotify</h2>
-      <p>Log in met het account van de host. Spotify Premium is nodig om af te spelen.</p>
-      <button class="button button-primary button-wide" id="connect-button">
-        <span class="button-icon">♫</span><span><small>LOG IN</small><strong>VERBIND SPOTIFY</strong></span>
-      </button>
-    </section>
+      <!-- Loading -->
+      <section class="panel screen" id="screen-loading">
+        <span class="equalizer big" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <p class="panel-sub" id="loading-text">Even geduld...</p>
+      </section>
 
-    <!-- Loading -->
-    <section class="card screen" id="screen-loading">
-      <div class="loader"><span></span><span></span><span></span></div>
-      <p id="loading-text">Even geduld...</p>
-    </section>
+      <!-- Playlist selection -->
+      <section class="panel screen" id="screen-playlist" hidden>
+        <h1 class="panel-title">KIES JE <span class="accent">PLAYLIST.</span></h1>
+        <input class="field" id="playlist-search" type="search" placeholder="Zoek..." autocomplete="off">
+        <ul class="playlist-list" id="playlist-list"></ul>
+      </section>
 
-    <!-- Playlist selection -->
-    <section class="card screen" id="screen-playlist" hidden>
-      <span class="info-kicker">STAP 2</span>
-      <h2>Kies je Top 2000-playlist</h2>
-      <p class="muted">Alleen playlists die van jou zijn (of waar je aan meewerkt) kunnen geladen worden.</p>
-      <input class="search" id="playlist-search" type="search" placeholder="Zoek playlist..." autocomplete="off">
-      <ul class="playlist-list" id="playlist-list"></ul>
-    </section>
+      <!-- Game -->
+      <section class="screen game" id="screen-game" hidden>
+        <section class="stage" aria-label="Muziekquiz">
+          <div class="copy">
+            <div id="answer" class="hero-content" aria-live="polite" aria-atomic="true"></div>
+          </div>
+          <div class="record-scene" aria-hidden="true">
+            <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+            <span class="scene-spark spark-one">✳</span><span class="scene-spark spark-two">✧</span>
+            <div class="vinyl"><div class="vinyl-shine"></div><div class="record-label"><span>TOP 2000</span><strong>DISCO<br>EDITION</strong><span>SIDE A · LET'S DANCE</span><i class="spindle"></i></div></div>
+            <img class="sleeve" id="sleeve" alt="" hidden>
+            <div class="record-stamp"><span>GOOD MUSIC</span><b>GOOD<br>TIMES.</b><span>ALL NIGHT LONG</span></div>
+          </div>
+        </section>
 
-    <!-- Game -->
-    <section class="game-panel screen" id="screen-game" aria-label="Spel" hidden>
-      <div class="panel-topline">
-        <span class="live-label"><span class="pulse"></span> <span id="live-text">SPEL BEZIG</span></span>
-        <span class="round-counter">RONDE <b id="round-number">00</b></span>
-      </div>
+        <section class="console" aria-label="Spelbediening">
+          <div class="playback-state"><span class="equalizer" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span id="playback-label"></span></div>
+          <div class="actions">
+            <button class="button button-next" id="next-button"><span class="button-symbol" aria-hidden="true">⏭</span><span id="next-label">VOLGENDE NUMMER</span></button>
+            <button class="button button-pause" id="pause-button" aria-label="Pauze" disabled><span class="button-symbol" id="pause-symbol" aria-hidden="true">❚❚</span></button>
+            <button class="button button-reveal" id="reveal-button" disabled><span class="button-symbol" aria-hidden="true">✳</span><span>ONTHUL ANTWOORD</span></button>
+          </div>
+        </section>
+      </section>
+    </main>
+    <footer class="footer"><span>v<span id="app-version"></span></span></footer>
+  </div>
 
-      <div class="track-stage">
-        <div class="disc disc-back"></div>
-        <div class="disc disc-front">
-          <div class="disc-label"><span>TOP<br>2000</span><small>♪</small></div>
-        </div>
-        <div class="soundwave" aria-hidden="true">
-          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-        </div>
-        <div class="track-status" id="track-status">KLAAR VOOR DE EERSTE PLAAT</div>
-      </div>
-
-      <div class="track-info" id="track-info" aria-live="polite"></div>
-
-      <div class="controls">
-        <button class="button button-secondary" id="next-button">
-          <span class="button-icon">↻</span>
-          <span><small id="next-small">START DE RONDE</small><strong>VOLGENDE NUMMER</strong></span>
-        </button>
-        <button class="button button-primary" id="reveal-button" disabled>
-          <span class="button-icon" id="reveal-icon">✦</span>
-          <span><small id="reveal-small">IEDEREEN EEN GOK?</small><strong id="reveal-strong">ONTHUL ANTWOORD</strong></span>
-        </button>
-      </div>
-
-    </section>
-
-    <footer>
-      <span>LET THE GOOD TIMES PLAY</span>
-      <span class="footer-star">✳</span>
-      <span>VERSIE <b id="app-version"></b></span>
-    </footer>
-  </main>
-
-  <dialog class="settings" id="settings">
-    <form method="dialog" class="settings-inner">
-      <div class="settings-head">
-        <h2>Instellingen</h2>
-        <button class="icon-button" value="close" aria-label="Sluiten">×</button>
-      </div>
+  <dialog id="settings">
+    <form method="dialog">
+      <div class="dialog-heading"><h2>INSTELLINGEN</h2><button class="close-button" value="close" aria-label="Sluiten">×</button></div>
 
       <div class="settings-block">
-        <span class="info-kicker">AFSPELEN OP</span>
+        <label for="device-select">Afspelen op</label>
         <div class="device-row">
           <select id="device-select"></select>
-          <button type="button" class="mini-button" id="device-refresh">VERNIEUW</button>
+          <button type="button" class="chip" id="device-refresh">VERNIEUW</button>
         </div>
-        <p class="muted small" id="device-hint">Op iPad: open de Spotify-app, speel kort iets af en druk op Vernieuw.</p>
+        <p class="hint">iPad: open Spotify, speel kort iets af en druk op Vernieuw.</p>
       </div>
 
       <div class="settings-block">
-        <span class="info-kicker">PLAYLIST</span>
-        <p id="settings-playlist">Geen playlist gekozen</p>
-        <div class="settings-actions">
-          <button type="button" class="mini-button" id="change-playlist">ANDERE PLAYLIST</button>
-          <button type="button" class="mini-button" id="reload-playlist">OPNIEUW LADEN</button>
+        <label>Playlist</label>
+        <p id="settings-playlist">-</p>
+        <p class="hint" id="settings-stats"></p>
+        <div class="chip-row">
+          <button type="button" class="chip" id="change-playlist">ANDERE PLAYLIST</button>
+          <button type="button" class="chip" id="reload-playlist">OPNIEUW LADEN</button>
+          <a class="chip" href="beheer.html">JAARTALLEN</a>
         </div>
       </div>
 
       <div class="settings-block">
-        <span class="info-kicker">JAARTALLEN</span>
-        <p id="settings-stats">-</p>
-        <a class="mini-button" href="beheer.html">JAARTALLEN BEHEREN</a>
+        <label>Sessie</label>
+        <p class="hint" id="settings-session"></p>
+        <button type="button" class="chip" id="new-session">OPNIEUW SCHUDDEN</button>
       </div>
 
-      <div class="settings-block">
-        <span class="info-kicker">SESSIE</span>
-        <p id="settings-session">-</p>
-        <button type="button" class="mini-button" id="new-session">NIEUWE SESSIE (OPNIEUW SCHUDDEN)</button>
-      </div>
-
-      <div class="settings-block">
-        <span class="info-kicker">SPOTIFY-KOPPELING</span>
-        <p class="muted small">Client ID staat alleen op dit apparaat.</p>
-        <button type="button" class="mini-button" id="reset-client">CLIENT ID WIJZIGEN</button>
-      </div>
-
-      <div class="settings-block settings-foot">
-        <button type="button" class="mini-button danger" id="logout-button">UITLOGGEN</button>
-        <span class="muted small">Versie <span id="settings-version"></span></span>
+      <div class="settings-block chip-row">
+        <button type="button" class="chip" id="reset-client">CLIENT ID WIJZIGEN</button>
+        <button type="button" class="chip danger" id="logout-button">UITLOGGEN</button>
+        <span class="hint version">v<span id="settings-version"></span></span>
       </div>
     </form>
   </dialog>

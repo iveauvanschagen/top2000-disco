@@ -7,19 +7,16 @@
   <meta name="robots" content="noindex">
   <title>Top 2000 Disco · Jaartallen</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="beheer">
-  <main class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="./">
-        <span class="brand-mark">✳</span>
-        <span class="brand-copy"><strong>TOP 2000</strong><small>JAARTALLEN BEHEREN</small></span>
-      </a>
+  <div class="app">
+    <header class="header">
+      <a class="brand" href="./"><span class="brand-top">TOP <b>2000</b><span class="brand-star" aria-hidden="true">✳</span></span><span class="brand-bottom">JAARTALLEN</span></a>
       <a class="mini-button" href="./">TERUG NAAR HET SPEL</a>
     </header>
-
+    <main>
     <section class="beheer-head">
       <span class="eyebrow">METADATA</span>
       <h1>Jaartallen</h1>
@@ -31,7 +28,7 @@
     <section class="card" id="login-card" hidden>
       <h2>Verbind met Spotify</h2>
       <p>Nodig om de playlist op te halen.</p>
-      <button class="button button-primary" id="login-button"><span><small>LOG IN</small><strong>VERBIND SPOTIFY</strong></span></button>
+      <button class="button button-next" id="login-button"><span>VERBIND SPOTIFY</span></button>
     </section>
 
     <section class="card" id="main-card" hidden>
@@ -64,7 +61,8 @@
         <ul class="unmatched" id="unmatched"></ul>
       </details>
     </section>
-  </main>
+    </main>
+  </div>
   <script type="module" src="js/beheer.js"></script>
 </body>
 </html>

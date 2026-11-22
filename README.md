@@ -14,7 +14,8 @@ Runs as a static site on GitHub Pages. There is no backend and no build step.
 - Answer stays hidden until it is revealed: fixed page title, artwork only loaded on reveal, neutral media-session metadata
 - Release years come from the official NPO Radio 2 Top 2000 list (`data/top2000-2025.json`). Songs not on the list fall back to the Spotify album year and are marked "nakijken"
 - Metadata page (`beheer.html`) to review and correct years, with export to `songs.json` and CSV
-- Dutch interface, flashy disco design (light beams, mirror ball, reveal flash), responsive (TV, laptop, tablet, phone), offline shell via a service worker
+- Dutch interface in a disco-poster design (Barlow Condensed + DM Sans, CSS-only vinyl artwork): minimal text, big Next song / Pause / Reveal answer buttons, album sleeve slides out of the record on reveal, flash and sparks, Top 2000 position shown with the answer
+- Responsive (TV, laptop, tablet, phone), offline shell via a service worker
 
 ## Requirements
 

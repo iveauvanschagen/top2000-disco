@@ -1,5 +1,5 @@
 // Service worker: offline shell. Bump VERSION with every release so clients refresh.
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const CACHE = `t2d-${VERSION}`;
 const SHELL = [
   './', 'index.html', 'beheer.html', 'styles.css', 'manifest.webmanifest', 'icon.svg',
