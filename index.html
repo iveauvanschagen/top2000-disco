@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090914">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Top 2000 Disco</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-state="loading">
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Top 2000 Disco">
+        <span class="brand-mark">✳</span>
+        <span class="brand-copy"><strong>TOP 2000</strong><small>DISCO EDITION</small></span>
+      </a>
+      <div class="topbar-right">
+        <span class="connection" id="connection"><i></i> <span id="connection-text">SPOTIFY NIET VERBONDEN</span></span>
+        <button class="icon-button" id="settings-button" aria-label="Instellingen" title="Instellingen">⚙</button>
+      </div>
+    </header>
+
+    <section class="intro">
+      <div class="eyebrow"><span class="eyebrow-line"></span> DE ULTIEME MUZIEKAVOND</div>
+      <h1>ZET DE <em>PLAAT</em><br>MAAR OP.</h1>
+      <p>Eén playlist. Een zaal vol muziekkenners.<br>Hoe goed ken jij je Top 2000?</p>
+    </section>
+
+    <div class="notice" id="notice" hidden><span id="notice-text"></span><button id="notice-close" aria-label="Sluiten">×</button></div>
+
+    <!-- Setup needed -->
+    <section class="card screen" id="screen-unconfigured" hidden>
+      <span class="info-kicker">EERST EVEN INSTELLEN</span>
+      <h2>Spotify Client ID ontbreekt</h2>
+      <p>Vul je Client ID in <code>js/config.js</code> in. De README legt stap voor stap uit hoe.</p>
+    </section>
+
+    <!-- Not connected -->
+    <section class="card screen" id="screen-connect" hidden>
+      <span class="info-kicker">STAP 1</span>
+      <h2>Verbind met Spotify</h2>
+      <p>Log in met het account van de host. Spotify Premium is nodig om af te spelen.</p>
+      <button class="button button-primary button-wide" id="connect-button">
+        <span class="button-icon">♫</span><span><small>LOG IN</small><strong>VERBIND SPOTIFY</strong></span>
+      </button>
+    </section>
+
+    <!-- Loading -->
+    <section class="card screen" id="screen-loading">
+      <div class="loader"><span></span><span></span><span></span></div>
+      <p id="loading-text">Even geduld...</p>
+    </section>
+
+    <!-- Playlist selection -->
+    <section class="card screen" id="screen-playlist" hidden>
+      <span class="info-kicker">STAP 2</span>
+      <h2>Kies je Top 2000-playlist</h2>
+      <p class="muted">Alleen playlists die van jou zijn (of waar je aan meewerkt) kunnen geladen worden.</p>
+      <input class="search" id="playlist-search" type="search" placeholder="Zoek playlist..." autocomplete="off">
+      <ul class="playlist-list" id="playlist-list"></ul>
+    </section>
+
+    <!-- Game -->
+    <section class="game-panel screen" id="screen-game" aria-label="Spel" hidden>
+      <div class="panel-topline">
+        <span class="live-label"><span class="pulse"></span> <span id="live-text">SPEL BEZIG</span></span>
+        <span class="round-counter">RONDE <b id="round-number">00</b></span>
+      </div>
+
+      <div class="track-stage">
+        <div class="disc disc-back"></div>
+        <div class="disc disc-front">
+          <div class="disc-label"><span>TOP<br>2000</span><small>♪</small></div>
+        </div>
+        <div class="soundwave" aria-hidden="true">
+          <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <div class="track-status" id="track-status">KLAAR VOOR DE EERSTE PLAAT</div>
+      </div>
+
+      <div class="track-info" id="track-info" aria-live="polite"></div>
+
+      <div class="controls">
+        <button class="button button-secondary" id="next-button">
+          <span class="button-icon">↻</span>
+          <span><small id="next-small">START DE RONDE</small><strong>VOLGENDE NUMMER</strong></span>
+        </button>
+        <button class="button button-primary" id="reveal-button" disabled>
+          <span class="button-icon" id="reveal-icon">✦</span>
+          <span><small id="reveal-small">IEDEREEN EEN GOK?</small><strong id="reveal-strong">ONTHUL ANTWOORD</strong></span>
+        </button>
+      </div>
+
+      <div class="mini-controls" id="mini-controls" hidden>
+        <button class="mini-button" id="pause-button">❚❚ <span>PAUZE</span></button>
+        <button class="mini-button" id="replay-button">↺ <span>OPNIEUW</span></button>
+      </div>
+
+      <div class="hint-row" id="hint-row"><span>♫</span> De discobal bepaalt wat er geraden moet worden.</div>
+    </section>
+
+    <section class="challenge-section">
+      <div class="section-heading">
+        <div><span class="eyebrow">DE DISCOBAL BEPAALT</span><h3>WAT MOET JE RADEN?</h3></div>
+        <span class="external-note">GEEN KAARTJES. GEWOON GOEIE MUZIEK.</span>
+      </div>
+      <div class="challenge-grid">
+        <div class="challenge-item"><span class="challenge-symbol">#</span><div><strong>EXACT JAAR</strong><small>Noem het releasejaar</small></div></div>
+        <div class="challenge-item"><span class="challenge-symbol">±3</span><div><strong>BINNEN 3 JAAR</strong><small>Dichtbij is goed genoeg</small></div></div>
+        <div class="challenge-item"><span class="challenge-symbol">Aa</span><div><strong>TITEL</strong><small>Hoe heet het nummer?</small></div></div>
+        <div class="challenge-item"><span class="challenge-symbol">♫</span><div><strong>ARTIEST</strong><small>Wie zingt het?</small></div></div>
+        <div class="challenge-item"><span class="challenge-symbol">80s</span><div><strong>DECENNIUM</strong><small>Welke jaren?</small></div></div>
+      </div>
+    </section>
+
+    <footer>
+      <span>VOOR JOUW TOP 2000-AVOND</span>
+      <span class="footer-star">✳</span>
+      <span>VERSIE <b id="app-version"></b></span>
+    </footer>
+  </main>
+
+  <dialog class="settings" id="settings">
+    <form method="dialog" class="settings-inner">
+      <div class="settings-head">
+        <h2>Instellingen</h2>
+        <button class="icon-button" value="close" aria-label="Sluiten">×</button>
+      </div>
+
+      <div class="settings-block">
+        <span class="info-kicker">AFSPELEN OP</span>
+        <div class="device-row">
+          <select id="device-select"></select>
+          <button type="button" class="mini-button" id="device-refresh">VERNIEUW</button>
+        </div>
+        <p class="muted small" id="device-hint">Op iPad: open de Spotify-app, speel kort iets af en druk op Vernieuw.</p>
+      </div>
+
+      <div class="settings-block">
+        <span class="info-kicker">PLAYLIST</span>
+        <p id="settings-playlist">Geen playlist gekozen</p>
+        <div class="settings-actions">
+          <button type="button" class="mini-button" id="change-playlist">ANDERE PLAYLIST</button>
+          <button type="button" class="mini-button" id="reload-playlist">OPNIEUW LADEN</button>
+        </div>
+      </div>
+
+      <div class="settings-block">
+        <span class="info-kicker">JAARTALLEN</span>
+        <p id="settings-stats">-</p>
+        <a class="mini-button" href="beheer.html">JAARTALLEN BEHEREN</a>
+      </div>
+
+      <div class="settings-block">
+        <span class="info-kicker">SESSIE</span>
+        <p id="settings-session">-</p>
+        <button type="button" class="mini-button" id="new-session">NIEUWE SESSIE (OPNIEUW SCHUDDEN)</button>
+      </div>
+
+      <div class="settings-block settings-foot">
+        <button type="button" class="mini-button danger" id="logout-button">UITLOGGEN</button>
+        <span class="muted small">Versie <span id="settings-version"></span></span>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090914">
+  <meta name="robots" content="noindex">
+  <title>Top 2000 Disco · Jaartallen</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="beheer">
+  <main class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./">
+        <span class="brand-mark">✳</span>
+        <span class="brand-copy"><strong>TOP 2000</strong><small>JAARTALLEN BEHEREN</small></span>
+      </a>
+      <a class="mini-button" href="./">TERUG NAAR HET SPEL</a>
+    </header>
+
+    <section class="beheer-head">
+      <span class="eyebrow">METADATA</span>
+      <h1>Jaartallen</h1>
+      <p class="muted">Bron 1 is de officiële NPO Top 2000-lijst. Nummers die daar niet in staan krijgen het Spotify-jaar en moeten nagekeken worden. Correcties worden in deze browser bewaard; exporteer ze naar <code>data/songs.json</code> om ze overal te gebruiken.</p>
+    </section>
+
+    <div class="notice" id="notice" hidden><span id="notice-text"></span><button id="notice-close" aria-label="Sluiten">×</button></div>
+
+    <section class="card" id="login-card" hidden>
+      <h2>Verbind met Spotify</h2>
+      <p>Nodig om de playlist op te halen.</p>
+      <button class="button button-primary" id="login-button"><span><small>LOG IN</small><strong>VERBIND SPOTIFY</strong></span></button>
+    </section>
+
+    <section class="card" id="main-card" hidden>
+      <p id="playlist-line" class="muted">Laden...</p>
+      <div class="stat-row" id="stats"></div>
+
+      <div class="toolbar">
+        <select id="filter">
+          <option value="needs-check">Nakijken</option>
+          <option value="notlist">Niet in Top 2000-lijst</option>
+          <option value="manual">Handmatig aangepast</option>
+          <option value="all">Alles</option>
+        </select>
+        <input id="search" type="search" placeholder="Zoek titel of artiest">
+        <button class="mini-button" id="export-json">EXPORT SONGS.JSON</button>
+        <button class="mini-button" id="export-csv">EXPORT CSV</button>
+        <label class="mini-button">IMPORT SONGS.JSON<input type="file" id="import-json" accept=".json,application/json" hidden></label>
+        <button class="mini-button" id="reload">PLAYLIST OPNIEUW LADEN</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="songs">
+          <thead><tr><th>TOP 2000</th><th>TITEL / ARTIEST</th><th>JAAR</th><th>STATUS</th><th>LIJST</th><th>SPOTIFY</th><th>ALBUM</th><th>OK</th><th>NOTITIE</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <details style="margin-top:16px">
+        <summary id="unmatched-summary">Lijstnummers zonder match in de playlist</summary>
+        <ul class="unmatched" id="unmatched"></ul>
+      </details>
+    </section>
+  </main>
+  <script type="module" src="js/beheer.js"></script>
+</body>
+</html>
