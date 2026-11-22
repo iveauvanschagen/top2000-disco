@@ -32,9 +32,14 @@ function hero([line1, line2]) {
   return h;
 }
 
+// Long titles get a smaller size so they never push the buttons off screen.
+function titleSize(t = '') {
+  return t.length > 34 ? ' xlong' : t.length > 20 ? ' long' : '';
+}
+
 function answer(song) {
   const nodes = [
-    el('h1', 'answer-title', song.displayTitle || song.title),
+    el('h1', `answer-title${titleSize(song.displayTitle || song.title)}`, song.displayTitle || song.title),
     el('p', 'artist', song.displayArtist || song.artist)
   ];
   const row = el('div', 'year-row');

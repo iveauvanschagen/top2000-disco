@@ -1,11 +1,11 @@
 // Service worker: offline shell. Bump VERSION with every release so clients refresh.
-const VERSION = '1.2.0';
+const VERSION = '1.3.0';
 const CACHE = `t2d-${VERSION}`;
 const SHELL = [
   './', 'index.html', 'beheer.html', 'styles.css', 'manifest.webmanifest', 'icon.svg',
   'js/app.js', 'js/auth.js', 'js/beheer.js', 'js/config.js', 'js/game.js', 'js/player.js',
   'js/playlist.js', 'js/shuffle.js', 'js/songs.js', 'js/spotify-api.js', 'js/storage.js',
-  'js/ui.js', 'js/years.js'
+  'js/timer.js', 'js/ui.js', 'js/years.js'
 ];
 
 self.addEventListener('install', e => {

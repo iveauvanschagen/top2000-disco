@@ -3,6 +3,7 @@ import { APP_VERSION, getRedirectUri } from './config.js';
 import * as game from './game.js';
 import * as player from './player.js';
 import { render, renderPlaylists, renderSettings } from './ui.js';
+import * as timer from './timer.js';
 
 const $ = id => document.getElementById(id);
 let playlistFilter = '';
@@ -91,6 +92,37 @@ game.subscribe(s => {
     }
   }
   lastName = s.name;
+});
+
+// Timer: starts when a song is playing, follows pause, stops on reveal.
+const timerEl = $('timer');
+timer.init({
+  update: ({ seconds, fraction, done }) => {
+    timerEl.style.setProperty('--p', fraction.toFixed(4));
+    $('timer-value').textContent = done ? 'TIJD!' : String(seconds);
+    timerEl.classList.toggle('urgent', !done && seconds <= 5);
+    timerEl.classList.toggle('done', done);
+  },
+  finished: () => { if (game.getState().playing) game.togglePause(); }
+});
+$('timer-toggle').checked = timer.isEnabled();
+$('timer-toggle').addEventListener('change', e => {
+  timer.setEnabled(e.target.checked);
+  if (!e.target.checked) { timer.reset(); timerEl.hidden = true; }
+});
+let timerRound = null;
+game.subscribe(s => {
+  const playing = s.name === 'playing' && !s.busy;
+  if (!timer.isEnabled() || (s.name !== 'playing')) {
+    if (s.name !== 'playing') { timer.reset(); timerRound = null; }
+    timerEl.hidden = true;
+    return;
+  }
+  if (!playing) return;
+  timerEl.hidden = false;
+  if (timerRound !== s.round) { timerRound = s.round; timer.start(); }
+  else if (s.playing) timer.resume();
+  else timer.pause();
 });
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {

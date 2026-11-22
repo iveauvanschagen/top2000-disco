@@ -1,5 +1,5 @@
 // Central configuration. The Spotify Client ID is public by design (PKCE, no secret).
-export const APP_VERSION = '1.2.0';
+export const APP_VERSION = '1.3.0';
 
 // The Spotify Client ID is entered in the app itself and stored on the device,
 // so it never has to be committed to the repository.
