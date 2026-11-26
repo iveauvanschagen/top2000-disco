@@ -48,7 +48,7 @@ export function buildCatalog(tracks, sources, localMeta = {}) {
     if (r.suspect) stats.suspect += 1;
     catalog.set(t.spotifyId, {
       ...t, ...meta, ...r,
-      displayTitle: listMatch?.title || cleanTitle(t.title),
+      displayTitle: cleanTitle(listMatch?.title || t.title),
       displayArtist: listMatch?.artist || t.artist,
       top2000Position: listMatch?.pos ?? null
     });

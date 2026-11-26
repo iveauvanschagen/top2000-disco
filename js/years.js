@@ -11,6 +11,9 @@ export function cleanTitle(title = '') {
     .replace(/\s+-\s+(\d{4}\s+)?(digital(ly)?\s+)?remaster(ed)?.*$/i, '')
     .replace(/\s+-\s+(single|radio|album|mono|stereo|original)( version| edit| mix)?.*$/i, '')
     .replace(/\s*[([](\d{4}\s+)?(digital(ly)?\s+)?remaster(ed)?[^)\]]*[)\]]/i, '')
+    // NPO list and Spotify version labels: "(Albumversie)", "(Single Version)", "(Radio Edit)", ...
+    .replace(/\s*[([](albumversie|singleversie|album version|single version|radio edit|radio version|original|originele versie|mono|stereo)[)\]]/gi, '')
+    .replace(/\s+(albumversie|album version|single version)(?=\))/gi, '')
     .trim() || title;
 }
 

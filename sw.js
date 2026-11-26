@@ -1,6 +1,6 @@
 // Service worker: network first, cache only as offline fallback.
 // Bump VERSION with every release.
-const VERSION = '1.5.0';
+const VERSION = '1.6.0';
 const CACHE = `t2d-${VERSION}`;
 const SHELL = [
   './', 'index.html', 'beheer.html', 'styles.css', 'manifest.webmanifest', 'icon.svg',

@@ -64,7 +64,7 @@ Open `http://127.0.0.1:8080/` (use 127.0.0.1, not localhost; Spotify requires a 
 
 ## Release years
 
-1. Official list: `data/top2000-2025.json` (converted from the NPO Excel file, 2000 songs with *Jaartal*). These years are treated as verified.
+1. Official list: `data/top2000-2025.json` (converted from the NPO Excel file, 2000 songs). Year rule: the year of the (first) single, or the original release year when there was no single. 138 NPO years that pointed to a later release or version were corrected; the original NPO value is kept as `npoYear`. Version labels such as "(Albumversie)" are hidden on reveal.
 2. Songs in your playlist that are not on the list get the Spotify album year and the status *nakijken* (Spotify years can come from reissues or compilations).
 3. Songs not on the list are marked red when the Spotify year probably belongs to a later version (new studio recording, re-recorded, remaster, anniversary, deluxe, live, greatest hits, compilation). Filter *Rood gemarkeerd* shows only those. For red songs only, *MusicBrainz (rood)* searches by title (without version noise) and artist and suggests the earliest release year; *Gebruik* confirms it. Each row also has a web search link for the original release year.
 4. Correct years in `beheer.html`. Manual corrections apply to the Spotify track and to other versions of the same song (title + artist). Corrections are stored in the browser; use *Export songs.json* and commit it to `data/songs.json` to make them permanent for every device.
