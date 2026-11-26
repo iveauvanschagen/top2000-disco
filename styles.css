@@ -326,3 +326,11 @@ body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [
 .header-right .settings-button{margin-left:0}
 .switch+.hint{margin:6px 0 14px 60px}
 :fullscreen .app,:-webkit-full-screen .app{min-height:100vh}
+
+/* 1.5.0 beheer: red flags */
+table.songs tr.suspect td{background:#ff60b912}
+table.songs tr.suspect td:first-child{box-shadow:inset 4px 0 0 #ff4f6d}
+table.songs tr.suspect .flags{color:#ff7a8f}
+.search-link{display:inline-block;margin-top:4px;font-size:12px;color:var(--cyan)}
+.use-mb{margin-left:6px;border:1px solid var(--cyan);background:transparent;color:var(--cyan);border-radius:999px;padding:3px 9px;font:700 10px var(--body);letter-spacing:1px;cursor:pointer}
+.use-mb:hover{background:#88eadf22}

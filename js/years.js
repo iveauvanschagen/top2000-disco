@@ -139,7 +139,25 @@ export function matchList(entries, tracks) {
   return { matches, matched: matches.size, unmatched };
 }
 
-// meta: { listYear, manualYear, manualVerified, notes }
+// Signs that a Spotify album year belongs to a later version, not the original.
+const SUSPECT_RE = /\b(new studio recording|studio recording|re-?recorded|re-?recording|taylor'?s version|remaster(ed)?|re-?issue|anniversary|deluxe|expanded|edition|greatest hits|best of|the very best|hits|collection|anthology|essentials?|gold|platinum|ultimate|compilation|singles|live|unplugged|acoustic|version)\b/i;
+
+// Title without version noise, for searching the original:
+// "Pokémon Theme-New Studio Recording" -> "Pokémon Theme".
+export function baseTitle(title = '') {
+  return cleanTitle(title)
+    .replace(/\s*[-–]\s*(new studio recording|studio recording|re-?recorded.*|live.*|acoustic.*|unplugged.*|single.*|radio edit.*|\d{4}.*)$/i, '')
+    .replace(/\s*[([][^)\]]*(version|recording|remaster|live|edit|mix|mono|stereo)[^)\]]*[)\]]/gi, '')
+    .trim() || title;
+}
+
+// Key that survives different versions of the same song (used for corrections).
+export function songKey(title = '', artist = '') {
+  const first = (artist.split(/,|&|\bfeat\.?|\bft\.?/i)[0] || '').trim();
+  return `${norm(baseTitle(title))}|${norm(first)}`;
+}
+
+// meta: { listYear, manualYear, manualVerified, mbYear, notes }
 // The official NPO Top 2000 list is treated as the authoritative source.
 export function resolveYear(track, meta = {}) {
   const { listYear, manualYear, manualVerified } = meta;
@@ -157,10 +175,13 @@ export function resolveYear(track, meta = {}) {
   } else {
     flags.push('geen jaar');
   }
+  let suspect = false;
   if (!listYear && !manualYear) {
-    flags.push('niet gevonden in Top 2000-lijst');
-    if (track.albumType === 'compilation') flags.push('verzamelalbum');
-    if (REISSUE_RE.test(track.album || '') || REISSUE_RE.test(track.title || '')) flags.push('heruitgave');
+    flags.push('niet in Top 2000-lijst');
+    if (track.albumType === 'compilation') { flags.push('verzamelalbum'); suspect = true; }
+    const hit = `${track.title || ''} ${track.album || ''}`.match(SUSPECT_RE);
+    if (hit) { flags.push(`"${hit[0]}"`); suspect = true; }
+    if (!sp) suspect = true;
   }
-  return { year, source, status, flags };
+  return { year, source, status, flags, suspect };
 }

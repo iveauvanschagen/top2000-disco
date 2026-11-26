@@ -19,6 +19,7 @@ Runs as a static site on GitHub Pages. There is no backend and no build step.
 - Setting *Start na het intro*: starts each song about 12% in (30 s for a typical 4-minute song; min 15 s, max 60 s, always at least a minute of music left)
 - Sound at 0 (setting with preview): countdown ticks at 5 to 1 and a beep at 0 (default), game-show buzzer, gong, airhorn, record scratch or none; synthesised with Web Audio, no audio files
 - Keyboard shortcuts: Space = pause, Right arrow = next song, Enter = reveal, F = fullscreen
+- Next song is only available when nothing is playing (at the start, when paused, after the reveal or when the list is done)
 - Fullscreen button in the header; the screen stays awake during the game (Wake Lock)
 - Responsive (TV, laptop, tablet, phone)
 - Always up to date: network-first service worker (cache only as offline fallback), automatic update check, one-time reload when a new version takes over (never mid-song), and an *App verversen* button in settings that clears all caches
@@ -65,7 +66,8 @@ Open `http://127.0.0.1:8080/` (use 127.0.0.1, not localhost; Spotify requires a 
 
 1. Official list: `data/top2000-2025.json` (converted from the NPO Excel file, 2000 songs with *Jaartal*). These years are treated as verified.
 2. Songs in your playlist that are not on the list get the Spotify album year and the status *nakijken* (Spotify years can come from reissues or compilations).
-3. Correct years in `beheer.html`. Corrections are stored in the browser; use *Export songs.json* and commit it to `data/songs.json` to make them permanent for every device.
+3. Songs not on the list are marked red when the Spotify year probably belongs to a later version (new studio recording, re-recorded, remaster, anniversary, deluxe, live, greatest hits, compilation). Filter *Rood gemarkeerd* shows only those. For red songs only, *MusicBrainz (rood)* searches by title (without version noise) and artist and suggests the earliest release year; *Gebruik* confirms it. Each row also has a web search link for the original release year.
+4. Correct years in `beheer.html`. Manual corrections apply to the Spotify track and to other versions of the same song (title + artist). Corrections are stored in the browser; use *Export songs.json* and commit it to `data/songs.json` to make them permanent for every device.
 
 New edition: add `data/top2000-<year>.json` in the same format (`{ "edition", "entries": [{ "pos", "title", "artist", "year" }] }`) and update `TOP2000_LIST_FILE` in `js/config.js`.
 

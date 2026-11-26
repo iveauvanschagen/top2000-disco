@@ -135,6 +135,7 @@ export function startOffset(song) {
 
 export async function next() {
   if (state.busy || !session) return;
+  if (state.name === 'playing' && state.playing) return;   // pause or reveal first
   if (!player.getDevicePref()) return notify(MESSAGES.no_device, 'info');
   clearNotice();
   const id = shuffle.nextId(session);

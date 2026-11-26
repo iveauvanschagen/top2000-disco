@@ -20,7 +20,7 @@
     <section class="beheer-head">
       <span class="eyebrow">METADATA</span>
       <h1>Jaartallen</h1>
-      <p class="muted">Bron 1 is de officiële NPO Top 2000-lijst. Nummers die daar niet in staan krijgen het Spotify-jaar en moeten nagekeken worden. Correcties worden in deze browser bewaard; exporteer ze naar <code>data/songs.json</code> om ze overal te gebruiken.</p>
+      <p class="muted">Bron 1 is de officiële NPO Top 2000-lijst. Nummers die daar niet in staan krijgen het Spotify-jaar en moeten nagekeken worden. Rood = waarschijnlijk een latere versie (remaster, nieuwe opname, verzamelalbum); daarvoor kun je MusicBrainz een voorstel laten doen. Correcties worden in deze browser bewaard; exporteer ze naar <code>data/songs.json</code> om ze overal te gebruiken.</p>
     </section>
 
     <div class="notice" id="notice" hidden><span id="notice-text"></span><button id="notice-close" aria-label="Sluiten">×</button></div>
@@ -37,21 +37,24 @@
 
       <div class="toolbar">
         <select id="filter">
+          <option value="suspect">Rood gemarkeerd</option>
           <option value="needs-check">Nakijken</option>
           <option value="notlist">Niet in Top 2000-lijst</option>
           <option value="manual">Handmatig aangepast</option>
           <option value="all">Alles</option>
         </select>
         <input id="search" type="search" placeholder="Zoek titel of artiest">
+        <button class="mini-button" id="mb-button">MUSICBRAINZ (ROOD)</button>
         <button class="mini-button" id="export-json">EXPORT SONGS.JSON</button>
         <button class="mini-button" id="export-csv">EXPORT CSV</button>
         <label class="mini-button">IMPORT SONGS.JSON<input type="file" id="import-json" accept=".json,application/json" hidden></label>
         <button class="mini-button" id="reload">PLAYLIST OPNIEUW LADEN</button>
       </div>
 
+      <p class="muted small" id="mb-text"></p>
       <div class="table-wrap">
         <table class="songs">
-          <thead><tr><th>TOP 2000</th><th>TITEL / ARTIEST</th><th>JAAR</th><th>STATUS</th><th>LIJST</th><th>SPOTIFY</th><th>ALBUM</th><th>OK</th><th>NOTITIE</th></tr></thead>
+          <thead><tr><th>TOP 2000</th><th>TITEL / ARTIEST</th><th>JAAR</th><th>STATUS</th><th>LIJST</th><th>MUSICBRAINZ</th><th>SPOTIFY</th><th>ALBUM</th><th>OK</th><th>NOTITIE</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>

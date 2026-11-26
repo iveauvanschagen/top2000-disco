@@ -107,7 +107,8 @@ export function render(s) {
     active ? (s.playing ? 'SPEELT' : 'GEPAUZEERD') : '';
 
   // Buttons
-  $('next-button').disabled = s.busy;
+  // Next only when nothing is playing: start, paused, revealed or exhausted.
+  $('next-button').disabled = s.busy || (s.name === 'playing' && s.playing);
   $('next-label').textContent = s.name === 'exhausted' ? 'NIEUWE SESSIE' : 'VOLGENDE NUMMER';
   $('reveal-button').disabled = !(s.name === 'playing' && !s.busy);
   $('pause-button').disabled = !(active && !s.busy);
