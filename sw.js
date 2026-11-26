@@ -1,12 +1,12 @@
 // Service worker: network first, cache only as offline fallback.
 // Bump VERSION with every release.
-const VERSION = '1.3.1';
+const VERSION = '1.4.0';
 const CACHE = `t2d-${VERSION}`;
 const SHELL = [
   './', 'index.html', 'beheer.html', 'styles.css', 'manifest.webmanifest', 'icon.svg',
   'js/app.js', 'js/auth.js', 'js/beheer.js', 'js/config.js', 'js/game.js', 'js/player.js',
   'js/playlist.js', 'js/shuffle.js', 'js/songs.js', 'js/spotify-api.js', 'js/storage.js',
-  'js/timer.js', 'js/ui.js', 'js/years.js', 'data/top2000-2025.json', 'data/songs.json'
+  'js/sounds.js', 'js/timer.js', 'js/ui.js', 'js/years.js', 'data/top2000-2025.json', 'data/songs.json'
 ];
 
 // Cache files one by one: a single missing file must never block an update.

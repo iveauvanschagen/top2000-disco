@@ -15,7 +15,11 @@ Runs as a static site on GitHub Pages. There is no backend and no build step.
 - Release years come from the official NPO Radio 2 Top 2000 list (`data/top2000-2025.json`). Songs not on the list fall back to the Spotify album year and are marked "nakijken"
 - Metadata page (`beheer.html`) to review and correct years, with export to `songs.json` and CSV
 - Dutch interface in a disco-poster design (Barlow Condensed + DM Sans, CSS-only vinyl artwork): minimal text, big Next song / Pause / Reveal answer buttons, album sleeve slides out of the record on reveal, flash and sparks, Top 2000 position shown with the answer
-- Optional 30-second timer (settings switch): starts when a song plays, follows pause, turns pink for the last 5 seconds and pauses the music at 0
+- 30-second timer while a song plays: follows pause, turns pink for the last 5 seconds, shows TIJD! at 0; setting *Muziek stopt bij 0* also pauses the music
+- Setting *Start na het intro*: starts each song about 12% in (30 s for a typical 4-minute song; min 15 s, max 60 s, always at least a minute of music left)
+- Sound at 0 (setting with preview): countdown ticks at 5 to 1 and a beep at 0 (default), game-show buzzer, gong, airhorn, record scratch or none; synthesised with Web Audio, no audio files
+- Keyboard shortcuts: Space = pause, Right arrow = next song, Enter = reveal, F = fullscreen
+- Fullscreen button in the header; the screen stays awake during the game (Wake Lock)
 - Responsive (TV, laptop, tablet, phone)
 - Always up to date: network-first service worker (cache only as offline fallback), automatic update check, one-time reload when a new version takes over (never mid-song), and an *App verversen* button in settings that clears all caches
 
@@ -83,7 +87,8 @@ js/songs.js           metadata merge and export
 js/years.js           list matching and year rules
 js/shuffle.js         random order without repeats
 js/game.js            state machine
-js/timer.js           optional 30-second countdown
+js/timer.js           30-second countdown
+js/sounds.js          timer sounds (Web Audio)
 js/ui.js, js/app.js   rendering and wiring
 js/beheer.js          metadata page
 ```

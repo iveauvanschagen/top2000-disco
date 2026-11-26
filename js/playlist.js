@@ -35,6 +35,7 @@ export function normalizeTrack(row) {
     album: t.album?.name || '',
     albumType: t.album?.album_type || '',
     spotifyYear: parseInt((t.album?.release_date || '').slice(0, 4), 10) || null,
+    durationMs: t.duration_ms || null,
     isrc: t.external_ids?.isrc || null,
     artwork: art?.url || null
   };
@@ -67,7 +68,7 @@ export function setSelectedPlaylist(p) {
 export async function loadTracks(playlistId, { force = false, onProgress } = {}) {
   const info = await getPlaylistInfo(playlistId);
   const cached = load(`tracks.${playlistId}`);
-  if (!force && cached && cached.snapshot === info.snapshot_id && cached.tracks?.length) {
+  if (!force && cached && cached.snapshot === info.snapshot_id && cached.tracks?.length && 'durationMs' in cached.tracks[0]) {
     return { playlist: info, tracks: cached.tracks, fromCache: true };
   }
   const rows = await getPlaylistItems(playlistId, onProgress);

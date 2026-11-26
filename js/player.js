@@ -122,11 +122,14 @@ export async function prime() {
   }
 }
 
-export async function playTrack(uri) {
+let currentStart = 0;
+
+export async function playTrack(uri, startMs = 0) {
   currentUri = uri;
+  currentStart = startMs;
   startMasking();
   const deviceId = await resolveDeviceId();
-  const body = { uris: [uri], position_ms: 0 };
+  const body = { uris: [uri], position_ms: Math.max(0, Math.round(startMs)) };
   try {
     await sp.play(deviceId, body);
   } catch (err) {
@@ -158,7 +161,7 @@ export async function resume() {
 }
 
 export async function replay() {
-  if (currentUri) return playTrack(currentUri);
+  if (currentUri) return playTrack(currentUri, currentStart);
 }
 
 export async function listDevices() {

@@ -4,6 +4,7 @@ import * as game from './game.js';
 import * as player from './player.js';
 import { render, renderPlaylists, renderSettings } from './ui.js';
 import * as timer from './timer.js';
+import * as sounds from './sounds.js';
 
 const $ = id => document.getElementById(id);
 let playlistFilter = '';
@@ -94,36 +95,87 @@ game.subscribe(s => {
   lastName = s.name;
 });
 
-// Timer: starts when a song is playing, follows pause, stops on reveal.
+// Timer: always counts down while a song plays; the setting decides whether
+// the music stops at 0. Follows pause, hidden on reveal.
 const timerEl = $('timer');
+let lastTickSecond = null;
 timer.init({
-  update: ({ seconds, fraction, done }) => {
+  update: ({ seconds, fraction, done, running }) => {
+    if (running && !done && seconds <= 5 && seconds >= 1 && seconds !== lastTickSecond) { lastTickSecond = seconds; sounds.tick(); }
+    if (seconds > 5) lastTickSecond = null;
     timerEl.style.setProperty('--p', fraction.toFixed(4));
     $('timer-value').textContent = done ? 'TIJD!' : String(seconds);
     timerEl.classList.toggle('urgent', !done && seconds <= 5);
     timerEl.classList.toggle('done', done);
   },
-  finished: () => { if (game.getState().playing) game.togglePause(); }
+  finished: () => {
+    lastTickSecond = null;
+    sounds.final();
+    if (timer.isEnabled() && game.getState().playing) game.togglePause();
+  }
 });
 $('timer-toggle').checked = timer.isEnabled();
-$('timer-toggle').addEventListener('change', e => {
-  timer.setEnabled(e.target.checked);
-  if (!e.target.checked) { timer.reset(); timerEl.hidden = true; }
-});
+$('timer-toggle').addEventListener('change', e => timer.setEnabled(e.target.checked));
+const soundSelect = $('sound-select');
+for (const [value, label] of sounds.OPTIONS) {
+  const o = document.createElement('option');
+  o.value = value; o.textContent = label; o.selected = value === sounds.getSound();
+  soundSelect.append(o);
+}
+soundSelect.addEventListener('change', e => { sounds.setSound(e.target.value); sounds.preview(e.target.value); });
+$('sound-preview').addEventListener('click', () => sounds.preview(soundSelect.value));
+// Audio may only start after a user gesture.
+['click', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, sounds.unlock, { passive: true }));
+$('intro-toggle').checked = game.isIntroSkip();
+$('intro-toggle').addEventListener('change', e => game.setIntroSkip(e.target.checked));
 let timerRound = null;
 game.subscribe(s => {
-  const playing = s.name === 'playing' && !s.busy;
-  if (!timer.isEnabled() || (s.name !== 'playing')) {
-    if (s.name !== 'playing') { timer.reset(); timerRound = null; }
-    timerEl.hidden = true;
-    return;
-  }
-  if (!playing) return;
+  if (s.name !== 'playing') { timer.reset(); timerRound = null; timerEl.hidden = true; return; }
+  if (s.busy) return;
   timerEl.hidden = false;
   if (timerRound !== s.round) { timerRound = s.round; timer.start(); }
   else if (s.playing) timer.resume();
   else timer.pause();
 });
+
+// Keyboard shortcuts (ignored while typing or with the settings open).
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey || $('settings').open) return;
+  if (e.target.closest?.('input, select, textarea')) return;
+  const map = { ' ': 'pause-button', ArrowRight: 'next-button', Enter: 'reveal-button' };
+  if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); return; }
+  const id = map[e.key];
+  if (!id || $('screen-game').hidden) return;
+  e.preventDefault();
+  if (!$(id).disabled) $(id).click();
+});
+// Mouse clicks should not leave focus on a button (space/enter would trigger it again).
+document.querySelectorAll('.button').forEach(b => b.addEventListener('click', () => b.blur()));
+
+// Fullscreen
+const fsTarget = document.documentElement;
+const fsSupported = Boolean(fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen);
+if (!fsSupported) $('fullscreen-button').hidden = true;
+function toggleFullscreen() {
+  if (!fsSupported) return;
+  const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+  if (fsEl) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else (fsTarget.requestFullscreen || fsTarget.webkitRequestFullscreen).call(fsTarget);
+}
+$('fullscreen-button').addEventListener('click', toggleFullscreen);
+
+// Keep the screen awake during the game (laptop/iPad must not dim or lock).
+let wakeLock = null;
+async function keepAwake() {
+  if (!('wakeLock' in navigator) || wakeLock || document.hidden) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => { wakeLock = null; });
+  } catch { /* not allowed right now, retry on next interaction */ }
+}
+game.subscribe(s => { if (!$('screen-game').hidden || s.name === 'playing') keepAwake(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) keepAwake(); });
+document.addEventListener('click', keepAwake);
 
 // Updates: always check for a new service worker, reload once when it takes over
 // (never in the middle of a song), and a manual "refresh app" escape hatch.

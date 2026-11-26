@@ -22,6 +22,7 @@
       <a class="brand" href="./" aria-label="Top 2000 Disco Edition"><span class="brand-top">TOP <b>2000</b><span class="brand-star" aria-hidden="true">✳</span></span><span class="brand-bottom">DISCO EDITION</span></a>
       <div class="header-right">
         <span class="connection" id="connection"><i></i><span id="connection-text">NIET VERBONDEN</span></span>
+        <button class="settings-button" id="fullscreen-button" aria-label="Volledig scherm (F)" title="Volledig scherm (F)"><span aria-hidden="true">⛶</span></button>
         <button class="settings-button" id="settings-button" aria-label="Instellingen" aria-haspopup="dialog"><span aria-hidden="true">⚙</span></button>
       </div>
     </header>
@@ -116,8 +117,16 @@
       </div>
 
       <div class="settings-block">
-        <label class="switch"><input type="checkbox" id="timer-toggle"><span class="switch-track"></span><span>Timer van 30 seconden</span></label>
-        <p class="hint">Telt af zodra een nummer speelt. Bij 0 pauzeert de muziek.</p>
+        <label class="switch"><input type="checkbox" id="timer-toggle"><span class="switch-track"></span><span>Muziek stopt bij 0</span></label>
+        <p class="hint">De timer telt altijd af van 30. Aan: bij 0 pauzeert het nummer.</p>
+        <label for="sound-select">Geluid bij 0</label>
+        <div class="device-row">
+          <select id="sound-select"></select>
+          <button type="button" class="chip" id="sound-preview">LUISTER</button>
+        </div>
+        <p class="hint"></p>
+        <label class="switch"><input type="checkbox" id="intro-toggle"><span class="switch-track"></span><span>Start na het intro</span></label>
+        <p class="hint">Begint zo'n 12% in het nummer (30 seconden bij een gemiddeld nummer).</p>
       </div>
 
       <div class="settings-block">
@@ -131,6 +140,9 @@
         <button type="button" class="chip" id="reset-client">CLIENT ID WIJZIGEN</button>
         <button type="button" class="chip danger" id="logout-button">UITLOGGEN</button>
         <span class="hint version">v<span id="settings-version"></span></span>
+      </div>
+      <div class="settings-block">
+        <p class="hint">Sneltoetsen: spatie = pauze, pijl rechts = volgende nummer, Enter = onthullen, F = volledig scherm.</p>
       </div>
     </form>
   </dialog>

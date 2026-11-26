@@ -319,3 +319,10 @@ body:is([data-state="ready"], [data-state="playing"], [data-state="revealed"], [
   .rank{font-size:32px}
   .button{font-size:24px}
 }
+
+/* 1.4.0 */
+#sound-select+.chip{flex-shrink:0}
+.device-row+.hint:empty{margin:0 0 14px}
+.header-right .settings-button{margin-left:0}
+.switch+.hint{margin:6px 0 14px 60px}
+:fullscreen .app,:-webkit-full-screen .app{min-height:100vh}

@@ -6,6 +6,7 @@ import * as songs from './songs.js';
 import * as shuffle from './shuffle.js';
 import * as player from './player.js';
 import { DEFAULT_PLAYLIST_ID } from './config.js';
+import { load, save } from './storage.js';
 
 const subscribers = new Set();
 let state = {
@@ -119,6 +120,19 @@ export async function openPlaylist(id, { force = false } = {}) {
   }
 }
 
+// "Start na het intro": skip ~12% of the song (30 s for a typical 4-minute song),
+// at least 15 s, at most 60 s, and always leave a minute of music.
+export const isIntroSkip = () => load('introSkip', false);
+export const setIntroSkip = on => save('introSkip', Boolean(on));
+
+export function startOffset(song) {
+  if (!isIntroSkip()) return 0;
+  const d = song.durationMs;
+  if (!d) return 30000;
+  const ms = Math.min(60000, Math.max(15000, d * 0.12));
+  return Math.max(0, Math.min(ms, d - 60000));
+}
+
 export async function next() {
   if (state.busy || !session) return;
   if (!player.getDevicePref()) return notify(MESSAGES.no_device, 'info');
@@ -134,7 +148,7 @@ export async function next() {
   set({ name: 'playing', busy: true, song, round: session.round, remaining: shuffle.remaining(session), playing: false });
   try {
     await player.prime();
-    await player.playTrack(song.uri);
+    await player.playTrack(song.uri, startOffset(song));
     set({ busy: false, playing: true });
   } catch (err) {
     fail(err);
