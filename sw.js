@@ -1,81 +1,49 @@
-// Service worker: bewaart de app zelf voor als je even geen netwerk hebt.
-// De radiostream en Spotify gaan altijd live over het netwerk.
-// Bij elke release gaat de versie omhoog, zodat alle bestanden tegelijk worden ververst.
-const CACHE = 'kink-switch-1.7.2';
-const FILES = [
-  './',
-  'index.html',
-  'manifest.webmanifest',
-  'icon-192.png',
-  'icon-512.png',
-  'icon-maskable-512.png',
-  'archivo-black.woff2',
-  'css/base.css',
-  'css/home.css',
-  'css/panels.css',
-  'js/artists.js',
-  'js/catch.js',
-  'js/config.js',
-  'js/dom.js',
-  'js/icons.js',
-  'js/log.js',
-  'js/main.js',
-  'js/silly.js',
-  'js/state.js',
-  'js/store.js',
-  'js/switcher.js',
-  'js/texts.js',
-  'js/util.js',
-  'js/wakelock.js',
-  'js/speed.js',
-  'js/kink/channel.js',
-  'js/kink/fade.js',
-  'js/kink/meta.js',
-  'js/kink/watch.js',
-  'js/kink/year.js',
-  'js/kink/radio.js',
-  'js/spotify/api.js',
-  'js/spotify/auth.js',
-  'js/spotify/keepawake.js',
-  'js/spotify/player.js',
-  'js/spotify/reach.js',
-  'js/ui/banner.js',
-  'js/ui/diagnose.js',
-  'js/ui/fit.js',
-  'js/ui/picker.js',
-  'js/ui/settings.js',
-  'js/ui/status.js',
-  'js/ui/tour.js',
-  'js/ui/tiles.js',
+// Service worker: network first, cache only as offline fallback.
+// Bump VERSION with every release.
+const VERSION = '1.3.1';
+const CACHE = `t2d-${VERSION}`;
+const SHELL = [
+  './', 'index.html', 'beheer.html', 'styles.css', 'manifest.webmanifest', 'icon.svg',
+  'js/app.js', 'js/auth.js', 'js/beheer.js', 'js/config.js', 'js/game.js', 'js/player.js',
+  'js/playlist.js', 'js/shuffle.js', 'js/songs.js', 'js/spotify-api.js', 'js/storage.js',
+  'js/timer.js', 'js/ui.js', 'js/years.js', 'data/top2000-2025.json', 'data/songs.json'
 ];
 
+// Cache files one by one: a single missing file must never block an update.
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
-  self.skipWaiting();
+  e.waitUntil((async () => {
+    const cache = await caches.open(CACHE);
+    await Promise.allSettled(SHELL.map(async url => {
+      const res = await fetch(url, { cache: 'reload' });
+      if (res.ok) await cache.put(url, res);
+    }));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))));
-  self.clients.claim();
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
-// Eerst het netwerk (altijd de nieuwste versie), anders uit de cache.
-// cache: 'no-cache' vraagt de server of een bestand veranderd is, zodat je nooit een mix van oud en nieuw krijgt.
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  if (url.origin !== location.origin || e.request.method !== 'GET') return;
-  // OAuth-terugkeer (?code=...) en gedeelde links nooit cachen
-  if (url.search) {
-    e.respondWith(fetch(e.request).catch(() => caches.match('./')));
-    return;
-  }
-  e.respondWith(
-    fetch(e.request, { cache: 'no-cache' })
-      .then(r => {
-        const copy = r.clone();
-        caches.open(CACHE).then(c => c.put(e.request, copy));
-        return r;
-      })
-      .catch(() => caches.match(e.request, { ignoreSearch: true }))
-  );
+  const req = e.request;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== location.origin) return;
+  e.respondWith((async () => {
+    try {
+      const res = await fetch(req, { cache: 'no-cache' });
+      if (res.ok && !url.search.includes('code=')) {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy)).catch(() => {});
+      }
+      return res;
+    } catch {
+      const hit = await caches.match(req, { ignoreSearch: true });
+      return hit || (req.mode === 'navigate' ? caches.match('index.html') : Response.error());
+    }
+  })());
 });

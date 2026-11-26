@@ -125,8 +125,42 @@ game.subscribe(s => {
   else timer.pause();
 });
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+// Updates: always check for a new service worker, reload once when it takes over
+// (never in the middle of a song), and a manual "refresh app" escape hatch.
+const inGame = () => ['playing', 'revealed'].includes(game.getState().name);
+
+async function hardRefresh() {
+  try {
+    const regs = await navigator.serviceWorker?.getRegistrations() || [];
+    await Promise.all(regs.map(r => r.unregister()));
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => caches.delete(k)));
+  } catch { /* ignore */ }
+  location.replace(location.pathname + '?v=' + Date.now());
+}
+$('refresh-app').addEventListener('click', hardRefresh);
+
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === '127.0.0.1')) {
+  let pendingReload = false;
+  const hadController = Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) return;
+    if (inGame()) pendingReload = true; else location.reload();
+  });
+  game.subscribe(s => { if (pendingReload && !['playing', 'revealed', 'loading'].includes(s.name)) location.reload(); });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+    reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+  }).catch(() => {});
+
+  // Safety net: if the live version differs from the running one, refresh once.
+  fetch('js/config.js', { cache: 'no-store' }).then(r => r.text()).then(src => {
+    const live = src.match(/APP_VERSION = '([\d.]+)'/)?.[1];
+    if (live && live !== APP_VERSION && !inGame() && sessionStorage.getItem('t2d.refreshed') !== live) {
+      sessionStorage.setItem('t2d.refreshed', live);
+      hardRefresh();
+    }
+  }).catch(() => {});
 }
 
 game.start();

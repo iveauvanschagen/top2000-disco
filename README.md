@@ -16,7 +16,8 @@ Runs as a static site on GitHub Pages. There is no backend and no build step.
 - Metadata page (`beheer.html`) to review and correct years, with export to `songs.json` and CSV
 - Dutch interface in a disco-poster design (Barlow Condensed + DM Sans, CSS-only vinyl artwork): minimal text, big Next song / Pause / Reveal answer buttons, album sleeve slides out of the record on reveal, flash and sparks, Top 2000 position shown with the answer
 - Optional 30-second timer (settings switch): starts when a song plays, follows pause, turns pink for the last 5 seconds and pauses the music at 0
-- Responsive (TV, laptop, tablet, phone), offline shell via a service worker
+- Responsive (TV, laptop, tablet, phone)
+- Always up to date: network-first service worker (cache only as offline fallback), automatic update check, one-time reload when a new version takes over (never mid-song), and an *App verversen* button in settings that clears all caches
 
 ## Requirements
 
@@ -70,7 +71,7 @@ New edition: add `data/top2000-<year>.json` in the same format (`{ "edition", "e
 index.html            game screen
 beheer.html           metadata management
 styles.css
-sw.js                 service worker (bump VERSION each release)
+sw.js                 network-first service worker (bump VERSION each release)
 data/top2000-2025.json  official list with years
 data/songs.json       exported corrections
 js/config.js          version, default playlist, data files
